@@ -1,7 +1,7 @@
 package be.vandewalleh
 
 fun main() {
-    val lines = object {}.javaClass.getResourceAsStream("/Day03.txt")!!.bufferedReader().readLines()
+    val lines = readLines()
     val numRe = Regex("\\d+")
     val numbers = lines.flatMapIndexed { index: Int, s: String ->
         numRe.findAll(s).map { (index to it.range) to it.value.toInt() }.toList()

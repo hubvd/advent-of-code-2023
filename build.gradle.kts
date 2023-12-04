@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.0.0-Beta1"
+    id("com.diffplug.spotless") version "6.23.2"
 }
 
 group = "be.vandewalleh"
@@ -18,4 +19,10 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
+}
+
+spotless {
+    kotlin {
+        ktlint().setEditorConfigPath("$projectDir/.editorconfig")
+    }
 }
