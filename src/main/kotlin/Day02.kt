@@ -3,10 +3,8 @@ package be.vandewalleh
 import kotlin.math.max
 
 fun main() {
-    val lines = readLines()
-    val re = Regex("(?<count>\\d+) (?<color>red|green|blue)")
-    val games = lines.map {
-        re.findAll(it).map { it.groups["count"]!!.value.toInt() to it.groups["color"]!!.value }.toList()
+    val games = readLines().map {
+        it.parseAll("(?<count>\\d+) (?<color>red|green|blue)") { this["count"]!!.value.toInt() to this["color"]!!.value }
     }
 
     var count = 0
