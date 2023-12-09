@@ -19,6 +19,6 @@ fun <T> String.parseAll(@Language("RegExp") regex: String, mapper: MatchGroupCol
     return regex.toRegex().findAll(this).map { with(it.groups) { mapper(it.value) } }.toList()
 }
 
-fun String.parseLongs(): List<Long> = parseAll("\\d+") { it.toLong() }
+fun String.parseLongs(): List<Long> = parseAll("-?\\d+") { it.toLong() }
 
-fun String.parseInts(): List<Int> = parseAll("\\d+") { it.toInt() }
+fun String.parseInts(): List<Int> = parseAll("-?\\d+") { it.toInt() }
