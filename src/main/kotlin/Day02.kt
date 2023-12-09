@@ -4,7 +4,9 @@ import kotlin.math.max
 
 fun main() {
     val games = readLines().map {
-        it.parseAll("(?<count>\\d+) (?<color>red|green|blue)") { this["count"]!!.value.toInt() to this["color"]!!.value }
+        it.parseAll(
+            "(?<count>\\d+) (?<color>red|green|blue)",
+        ) { this["count"]!!.value.toInt() to this["color"]!!.value }
     }
 
     var count = 0

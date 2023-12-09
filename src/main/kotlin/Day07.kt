@@ -44,7 +44,7 @@ fun main() {
         .map { it.split(' ') }
         .sortedWith(
             compareBy<List<String>, String>(::compareOccurrences) { it.first() }
-                .then(compareBy(::compareCards) { it.first() })
+                .then(compareBy(::compareCards) { it.first() }),
         )
         .mapIndexed { index, (_, score) -> (index + 1) * score.toInt() }
         .sum()
@@ -55,7 +55,7 @@ fun main() {
         .map { it.split(' ') }
         .sortedWith(
             compareBy<List<String>, String>(::compareOccurrences) { best(it.first()) }
-                .then(compareBy(::compareCards) { it.first().replace('J', '1') })
+                .then(compareBy(::compareCards) { it.first().replace('J', '1') }),
         )
         .mapIndexed { index, (_, score) -> (index + 1) * score.toInt() }
         .sum()
