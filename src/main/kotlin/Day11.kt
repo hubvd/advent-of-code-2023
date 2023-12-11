@@ -19,21 +19,17 @@ fun main() {
     val emptyColumns = (0..maxX).filter { it !in xs }
 
     fun compute(size: Int): Long {
-        val expandedGalaxies = buildList {
-            galaxies.forEach { (x, y) ->
-                add(
-                    Point(
-                        x + (emptyColumns.count { it < x } * (size - 1)),
-                        y + (emptyLines.count { it < y } * (size - 1)),
-                    ),
-                )
-            }
+        val expandedGalaxies = galaxies.map { (x, y) ->
+            Point(
+                x + (emptyColumns.count { it < x } * (size - 1)),
+                y + (emptyLines.count { it < y } * (size - 1)),
+            )
         }
 
         return buildList {
             expandedGalaxies.indices.forEach { i ->
                 for (j in i + 1 until expandedGalaxies.size) {
-                    this.add(
+                    add(
                         expandedGalaxies[i] to expandedGalaxies[j],
                     )
                 }
