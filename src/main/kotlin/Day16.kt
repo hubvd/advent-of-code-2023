@@ -3,7 +3,7 @@ package be.vandewalleh
 import kotlin.math.absoluteValue
 
 fun main() {
-    var input = readLines()
+    val input = readLines()
 
     val height = input.size
     val width = input.first().length
@@ -13,42 +13,37 @@ fun main() {
         .flatten()
         .toMap()
 
-    println(points)
+    val right = Point(1, 0)
+    val up = Point(0, -1)
+    val down = Point(0, 1)
+    val left = Point(-1, 0)
 
     fun next(point: Point, direction: Point): List<Point> {
         val char = points[point] ?: return listOf(direction)
         return when (char) {
             '/' -> {
                 when (direction) {
-                    Point(1, 0) -> listOf(Point(0, -1))
-
-                    Point(0, 1) -> listOf(Point(-1, 0))
-
-                    Point(0, -1) -> listOf(Point(1, 0))
-
-                    Point(-1, 0) -> listOf(Point(0, 1))
-
-                    else -> TODO(direction.toString())
+                    right -> listOf(up)
+                    down -> listOf(left)
+                    up -> listOf(right)
+                    left -> listOf(down)
+                    else -> throw IllegalStateException()
                 }
             }
 
             '\\' -> when (direction) {
-                Point(1, 0) -> listOf(Point(0, 1))
-
-                Point(0, -1) -> listOf(Point(-1, 0))
-
-                Point(-1, 0) -> listOf(Point(0, -1))
-
-                Point(0, 1) -> listOf(Point(1, 0))
-
-                else -> TODO(direction.toString())
+                right -> listOf(down)
+                up -> listOf(left)
+                left -> listOf(up)
+                down -> listOf(right)
+                else -> throw IllegalStateException()
             }
 
             '-' -> {
                 if (direction.x.absoluteValue == 1) {
                     listOf(direction)
                 } else {
-                    listOf(Point(-1, 0), Point(1, 0))
+                    listOf(left, right)
                 }
             }
 
@@ -56,11 +51,11 @@ fun main() {
                 if (direction.y.absoluteValue == 1) {
                     listOf(direction)
                 } else {
-                    listOf(Point(0, -1), Point(0, 1))
+                    listOf(up, down)
                 }
             }
 
-            else -> TODO()
+            else -> throw IllegalStateException()
         }
     }
 
@@ -90,17 +85,17 @@ fun main() {
         return visited.size
     }
 
-    println(solve(Point(0, 0), Point(1, 0)))
+    println(solve(Point(0, 0), right))
 
     sequence {
         for (x in 0 until width) {
-            yield(Point(x, 0) to Point(0, 1))
-            yield(Point(x, height - 1) to Point(0, -1))
+            yield(Point(x, 0) to down)
+            yield(Point(x, height - 1) to up)
         }
 
         for (y in 0 until height) {
-            yield(Point(0, y) to Point(1, 0))
-            yield(Point(width - 1, y) to Point(-1, 0))
+            yield(Point(0, y) to right)
+            yield(Point(width - 1, y) to left)
         }
-    }.map { solve(it.first, it.second) }.max().also { println(it) }
+    }.maxOfOrNull { solve(it.first, it.second) }.also { println(it) }
 }
