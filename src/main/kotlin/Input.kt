@@ -15,8 +15,12 @@ fun readText(): String {
 @Suppress("NOTHING_TO_INLINE")
 inline fun readLines() = readText().lines()
 
+fun <T> String.parseAll(regex: Regex, mapper: MatchGroupCollection.(String) -> T): List<T> {
+    return regex.findAll(this).map { with(it.groups) { mapper(it.value) } }.toList()
+}
+
 fun <T> String.parseAll(@Language("RegExp") regex: String, mapper: MatchGroupCollection.(String) -> T): List<T> {
-    return regex.toRegex().findAll(this).map { with(it.groups) { mapper(it.value) } }.toList()
+    return parseAll(regex.toRegex(), mapper)
 }
 
 fun String.parseLongs(): List<Long> = parseAll("-?\\d+") { it.toLong() }
