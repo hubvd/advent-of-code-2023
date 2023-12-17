@@ -83,5 +83,4 @@ fun main() {
         current = cycle(current.toList())
     }
     println(current.sumOf { (height - it.y).toLong() })
-
 }
