@@ -1,28 +1,19 @@
 package be.vandewalleh
 
 fun main() {
-    val input = readLines()
-
-    val points = input
-        .asSequence()
-        .mapIndexed { y, s -> s.mapIndexedNotNull { x, c -> if (c != '.') (x at y) to c else null } }
-        .flatten()
-        .groupBy { it.second }
-
-    val height = input.size
-    val width = input.first().length
-
-    val rocks = points['O']!!.map { it.first }
-    val squares = points['#']!!.map { it.first }
+    val grid = Grid.from(readText())
+    val groups = grid.grouped()
+    val rocks = groups['O']!!
+    val squares = groups['#']!!
 
     fun move(rocks: List<Point>, translation: Point): List<Point> {
         val newRocks = rocks.toHashSet()
 
         val sorted = when (translation) {
-            Point(0, -1) -> rocks.sortedBy { it.y }
-            Point(0, 1) -> rocks.sortedByDescending { it.y }
-            Point(-1, 0) -> rocks.sortedBy { it.x }
-            Point(1, 0) -> rocks.sortedByDescending { it.x }
+            Point.up -> rocks.sortedBy { it.y }
+            Point.down -> rocks.sortedByDescending { it.y }
+            Point.left -> rocks.sortedBy { it.x }
+            Point.right -> rocks.sortedByDescending { it.x }
             else -> throw IllegalStateException()
         }
         sorted.forEach { rock ->
@@ -30,39 +21,32 @@ fun main() {
 
             while (true) {
                 val newPoint = prev + translation
-                if (newPoint.x !in 0 until width || newPoint.y !in 0 until height) {
+                if (newPoint !in grid || newPoint in squares || !newRocks.add(newPoint)) {
                     break
                 }
-                if (newPoint in squares) {
-                    break
-                }
-                if (newRocks.add(newPoint)) {
-                    newRocks.remove(prev)
-                    prev = newPoint
-                } else {
-                    break
-                }
+                newRocks.remove(prev)
+                prev = newPoint
             }
         }
         return newRocks.toList()
     }
 
-    println(move(rocks.toList(), Point(0, -1)).sumOf { (height - it.y).toLong() })
+    println(move(rocks, Point(0, -1)).sumOf { (grid.height - it.y) })
 
     fun cycle(rocks: List<Point>): List<Point> {
-        var current = rocks.toList()
-        current = move(current, Point(0, -1))
-        current = move(current, Point(-1, 0))
-        current = move(current, Point(0, 1))
-        return move(current, Point(1, 0))
+        var current = rocks
+        current = move(current, Point.up)
+        current = move(current, Point.left)
+        current = move(current, Point.down)
+        return move(current, Point.right)
     }
 
     fun detectCycle(rocks: List<Point>): Pair<Int, Int> {
-        var current = rocks.toList()
+        var current = rocks
         var currentCycle = 0
         val codesByCycles = HashMap<Int, Int>()
         while (true) {
-            current = cycle(current.toList())
+            current = cycle(current)
             val hashcode = current.hashCode()
             val previousMatchingCycle = codesByCycles.putIfAbsent(hashcode, currentCycle)
             if (previousMatchingCycle != null) {
@@ -72,15 +56,13 @@ fun main() {
         }
     }
 
-    val (cycleStart, cycleLength) = detectCycle(rocks.toList())
+    val (cycleStart, cycleLength) = detectCycle(rocks)
     val total = 1000000000
-    val n = total - cycleStart
-    val m = n / cycleLength
-    val x = total - (m * cycleLength)
+    val steps = total - (total - cycleStart) / cycleLength * cycleLength
 
-    var current = rocks.toList()
-    repeat(x) {
-        current = cycle(current.toList())
-    }
-    println(current.sumOf { (height - it.y).toLong() })
+    generateSequence(rocks) { cycle(it) }
+        .drop(steps)
+        .first()
+        .sumOf { (grid.height - it.y) }
+        .also { println(it) }
 }

@@ -3,39 +3,26 @@ package be.vandewalleh
 import kotlin.math.absoluteValue
 
 fun main() {
-    val input = readLines()
-
-    val height = input.size
-    val width = input.first().length
-
-    val points = input
-        .mapIndexed { y, s -> s.mapIndexedNotNull { x, c -> if (c != '.') (x at y) to c else null } }
-        .flatten()
-        .toMap()
-
-    val right = Point(1, 0)
-    val up = Point(0, -1)
-    val down = Point(0, 1)
-    val left = Point(-1, 0)
+    val grid = Grid.from(readText())
 
     fun next(point: Point, direction: Point): List<Point> {
-        val char = points[point] ?: return listOf(direction)
+        val char = grid[point]?.takeIf { it != '.' } ?: return listOf(direction)
         return when (char) {
             '/' -> {
                 when (direction) {
-                    right -> listOf(up)
-                    down -> listOf(left)
-                    up -> listOf(right)
-                    left -> listOf(down)
+                    Point.right -> listOf(Point.up)
+                    Point.down -> listOf(Point.left)
+                    Point.up -> listOf(Point.right)
+                    Point.left -> listOf(Point.down)
                     else -> throw IllegalStateException()
                 }
             }
 
             '\\' -> when (direction) {
-                right -> listOf(down)
-                up -> listOf(left)
-                left -> listOf(up)
-                down -> listOf(right)
+                Point.right -> listOf(Point.down)
+                Point.up -> listOf(Point.left)
+                Point.left -> listOf(Point.up)
+                Point.down -> listOf(Point.right)
                 else -> throw IllegalStateException()
             }
 
@@ -43,7 +30,7 @@ fun main() {
                 if (direction.x.absoluteValue == 1) {
                     listOf(direction)
                 } else {
-                    listOf(left, right)
+                    listOf(Point.left, Point.right)
                 }
             }
 
@@ -51,7 +38,7 @@ fun main() {
                 if (direction.y.absoluteValue == 1) {
                     listOf(direction)
                 } else {
-                    listOf(up, down)
+                    listOf(Point.up, Point.down)
                 }
             }
 
@@ -71,7 +58,7 @@ fun main() {
             val next = next(point, direction)
             for (newDirection in next) {
                 val newPoint = newDirection + point
-                if (newPoint.x !in 0 until width || newPoint.y !in 0 until height) {
+                if (newPoint !in grid) {
                     continue
                 }
                 visited += newPoint
@@ -85,17 +72,17 @@ fun main() {
         return visited.size
     }
 
-    println(solve(Point(0, 0), right))
+    println(solve(Point(0, 0), Point.right))
 
     sequence {
-        for (x in 0 until width) {
-            yield(Point(x, 0) to down)
-            yield(Point(x, height - 1) to up)
+        for (x in grid.columnIndices) {
+            yield(Point(x, 0) to Point.down)
+            yield(Point(x, grid.height - 1) to Point.up)
         }
 
-        for (y in 0 until height) {
-            yield(Point(0, y) to right)
-            yield(Point(width - 1, y) to left)
+        for (y in grid.rowIndices) {
+            yield(Point(0, y) to Point.right)
+            yield(Point(grid.width - 1, y) to Point.left)
         }
     }.maxOfOrNull { solve(it.first, it.second) }.also { println(it) }
 }
