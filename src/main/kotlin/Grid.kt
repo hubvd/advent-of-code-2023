@@ -11,15 +11,17 @@ class Grid<T>(val values: Map<Point, T>, val width: Int, val height: Int) {
     fun grouped(): Map<T, List<Point>> = values.entries.groupBy({ it.value }, { it.key })
 
     companion object {
-        fun from(text: String): Grid<Char> {
+
+        fun from(text: String): Grid<Char> = from(text) { it }
+        fun <T> from(text: String, mapper: (Char) -> T): Grid<T> {
             val lines = text.lines()
             val height = lines.size
             val width = lines.first().length
 
             val values = lines
-                .mapIndexed { y, s -> s.mapIndexed { x, c -> (x at y) to c } }
+                .mapIndexed { y, s -> s.mapIndexed { x, c -> (x at y) to mapper(c) } }
                 .flatten()
-                .toMap()
+                .toMap(HashMap())
 
             return Grid(values, width, height)
         }
